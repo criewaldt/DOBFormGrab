@@ -15,6 +15,8 @@ for l in links:
         if "Form" in g:
             g = g.replace('/', '-')
             r = requests.get("https://www.nyc.gov/{}".format(l['href']), allow_redirects=True)
+
             with open("Forms/{}.pdf".format(g), 'wb') as pdf:
                 pdf.write(r.content)
-                print('Downloaded: {}'.format(g))
+            
+            print('Downloaded: {}'.format(g))
