@@ -1,0 +1,94 @@
+function toggleAnswer(theQuestionDiv){
+	if($(theQuestionDiv).hasClass("collapsed")){
+ 		var theAnswer=theQuestionDiv.data("answer");
+		theQuestionDiv.attr('aria-controls',theAnswer);
+		theQuestionDiv.attr('aria-label',$.trim(theQuestionDiv.text()));
+		$('.faq-questions').addClass('collapsed').removeClass('expanded');	
+		$('.faq-answers').attr('aria-hidden','true');
+		$('.faq-questions').attr('aria-expanded','false');	
+	  	$('.faq-answers').slideUp('fast').promise().done(function(){
+		   	$('#'+theAnswer).slideDown('fast', function(){
+				$(theQuestionDiv).removeClass('collapsed').addClass('expanded');
+				$(theQuestionDiv).attr('aria-expanded','true');
+				$('#'+theAnswer).attr('aria-hidden','false');
+			   	$('html, body').animate({
+					scrollTop: $(theQuestionDiv).offset().top
+				}, 500);
+		   	});
+	   	});
+	}else{
+		collapseAll();
+	}
+}
+
+function expandAll(){
+	$('.faq-answers').slideDown('fast');
+	$('.faq-questions').addClass('expanded').removeClass('collapsed');
+	$('.faq-answers').attr('aria-hidden','false');
+	$('.faq-questions').attr('aria-expanded','true');	
+}
+
+function collapseAll(){
+   	$('.faq-answers').slideUp('fast');
+	$('.faq-questions').addClass('collapsed').removeClass('expanded');	
+	$('.faq-answers').attr('aria-hidden','true');
+	$('.faq-questions').attr('aria-expanded','false');	
+}
+function addLoadEvent(func) { 
+	var oldonload = window.onload; 
+	if (typeof window.onload != 'function') { 
+		window.onload = func; 
+	} else { 
+		window.onload = function() { 
+			if (oldonload) { 
+				oldonload(); 
+			} 
+			func(); 
+		} 
+	} 
+}
+addLoadEvent(setClasses);
+function setClasses(){
+	if (!$("link[href='https://www1.nyc.gov/assets/home/css/pages/agencies/expand-collapse.css']").length){
+		$("<link/>", {
+			rel: "stylesheet",
+			type: "text/css",
+			href: "https://www1.nyc.gov/assets/home/css/pages/agencies/expand-collapse.css"
+		}).appendTo("head");
+	}
+	$('.faq-questions').addClass('collapsed');
+	$('.faq-questions').attr('role','button');
+	$('.faq-questions').attr('tabindex','0');
+	$('.faq-questions').attr('aria-expanded','false');
+	$('.faq-answers').attr('role','region');
+	$('.faq-answers').attr('aria-hidden','true');
+	var queryQuestion = getParam('question')||"";
+	if(queryQuestion.length>0){
+		toggleAnswer($('[data-answer="'+queryQuestion+'"]'));
+	}
+	$('.faq-questions').on('click',function() {
+		var e = $(this);
+		toggleAnswer(e);
+	});
+	$('.faq-questions').keyup(function(event) {
+		var code = event.which; 
+		var e = $(this);
+		if(code==13){
+			toggleAnswer(e);	
+		}
+	});
+}
+
+function getParam(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
