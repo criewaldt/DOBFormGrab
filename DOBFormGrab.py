@@ -2,21 +2,47 @@
 from bs4 import BeautifulSoup
 import requests
 
+def download_form(name=None, url=None):
+    name = name.replace('/', '-')
+    r = requests.get("https://www.nyc.gov/{}".format(url), allow_redirects=True)
 
-with open("dobForms.mhtml") as fp:
-    soup = BeautifulSoup(fp, 'html.parser')
+    with open("Forms/{}.pdf".format(name), 'wb') as pdf:
+        pdf.write(r.content)
+    
+    print('Downloaded: {}'.format(name))
 
-links = soup.find_all('a')
-for l in links:
+class DOBFormGrab():
+    def local(self, f="dobForms.mhtml"):
+        with open(f) as fp:
+            soup = BeautifulSoup(fp, 'html.parser')
 
-    g = l.string
-    if g is not None:
+        links = soup.find_all('a')
+        for l in links:
 
-        if "Form" in g:
-            g = g.replace('/', '-')
-            r = requests.get("https://www.nyc.gov/{}".format(l['href']), allow_redirects=True)
+            name = l.string
+            url = l['href']
 
-            with open("Forms/{}.pdf".format(g), 'wb') as pdf:
-                pdf.write(r.content)
-            
-            print('Downloaded: {}'.format(g))
+            if name is not None:
+
+                if "Form" in name:
+                    download_form(name, url)  
+    
+    def web(self, url="https://www.nyc.gov/site/buildings/dob/forms.page"):
+        r = requests.get(url, allow_redirects=True)
+        soup = BeautifulSoup(r.content, 'html.parser')
+
+        links = soup.find_all('a')
+        for l in links:
+
+            name = l.string
+            url = l['href']
+
+            if name is not None:
+
+                if "Form" in name:
+                    download_form(name, url)
+
+
+if __name__ == "__main__":
+    get_forms = DOBFormGrab()
+    get_forms.web()
