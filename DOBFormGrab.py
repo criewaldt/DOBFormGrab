@@ -2,6 +2,9 @@
 from bs4 import BeautifulSoup
 import requests
 
+#local html file with links to download
+STATIC_FILE = "dobForms.mhtml"
+
 def download_form(name=None, url=None):
     name = name.replace('/', '-')
     r = requests.get("https://www.nyc.gov/{}".format(url), allow_redirects=True)
@@ -12,7 +15,7 @@ def download_form(name=None, url=None):
     print('Downloaded: {}'.format(name))
 
 class DOBFormGrab():
-    def local(self, f="dobForms.mhtml"):
+    def local(self, f=STATIC_FILE):
         with open(f) as fp:
             soup = BeautifulSoup(fp, 'html.parser')
 
